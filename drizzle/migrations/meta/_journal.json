@@ -8,6 +8,20 @@
       "when": 1793633263534,
       "tag": "0000_create_profiles_for_invited_users",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793636031458,
+      "tag": "0001_add_isolated_execution_controls",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793636399014,
+      "tag": "0002_restrict_execution_table_grants",
+      "breakpoints": true
     }
   ]
 }
