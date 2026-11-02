@@ -9,8 +9,9 @@ import { Message, MessageContent, MessageResponse } from "@/components/ai-elemen
 import { PromptInput, PromptInputFooter, PromptInputSubmit, PromptInputTextarea } from "@/components/ai-elements/prompt-input";
 import { Shimmer } from "@/components/ai-elements/shimmer";
 import emblem from "@/assets/xplo-emblem.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/chat/$threadId")({
+export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   head: () => ({ meta: [{ title: "Conversation — XPLO AI" }, { name: "description", content: "Private guided cybersecurity conversation with XPLO AI." }, { property: "og:title", content: "XPLO AI conversation" }, { property: "og:description", content: "Guided cybersecurity research conversation." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ChatPage,
 });
@@ -50,7 +51,10 @@ function Chat({ threadId, agent, initial, environment, level, specialties, updat
     abort.current = controller;
     let answer = "";
     try {
-      const res = await fetch("/api/chat", { method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ agent, environment, level, specialties, messages: history.map((m) => ({ role: m.role, content: textOf(m) })) }) });
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) throw new Error("Your session has ended. Sign in again to continue.");
+      const res = await fetch("/api/chat", { method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ agent, environment, level, specialties, messages: history.map((m) => ({ role: m.role, content: textOf(m) })) }) });
       if (!res.ok || !res.body) { const data = await res.json().catch(() => ({})); throw new Error(data.error ?? "XPLO could not answer right now."); }
       setStatus("streaming");
       const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = "";

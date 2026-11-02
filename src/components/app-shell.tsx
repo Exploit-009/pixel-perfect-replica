@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Home, MessageSquarePlus, ShieldCheck, SlidersHorizontal, Wrench } from "lucide-react";
+import { Home, LogOut, MessageSquarePlus, ShieldCheck, SlidersHorizontal, Wrench } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import emblem from "@/assets/xplo-emblem.jpg";
 import { useXplo } from "@/components/xplo-session";
 
@@ -12,8 +14,25 @@ const nav = [
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { createThread } = useXplo();
+  const { createThread, reset } = useXplo();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: name } = useQuery({
+    queryKey: ["profile-name"],
+    queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) return "";
+      const { data } = await supabase.from("profiles").select("display_name").eq("id", auth.user.id).maybeSingle();
+      return data?.display_name || auth.user.email || "";
+    },
+  });
+  const signOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    reset();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", search: { redirect: "/" }, replace: true });
+  };
   const start = () => {
     const id = createThread("New conversation");
     navigate({ to: "/chat/$threadId", params: { threadId: id } });
@@ -28,9 +47,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Cybersecurity Edition</p>
           </div>
         </Link>
-        <button onClick={start} className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground">
-          <MessageSquarePlus className="size-4" /> New chat
-        </button>
+        <div className="flex items-center gap-2">
+          {name ? <span className="hidden max-w-28 truncate text-xs text-muted-foreground sm:inline">{name}</span> : null}
+          <button onClick={start} className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground">
+            <MessageSquarePlus className="size-4" /> New chat
+          </button>
+          <button onClick={signOut} aria-label="Sign out" title="Sign out" className="inline-flex size-9 items-center justify-center rounded-md border text-muted-foreground hover:text-foreground">
+            <LogOut className="size-4" />
+          </button>
+        </div>
       </header>
       <div className="flex-1 pb-20">{children}</div>
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur">

@@ -5,7 +5,7 @@ import { AgentIcon } from "@/components/agent-icon";
 import { agents, specialties } from "@/lib/xplo";
 import { useXplo } from "@/components/xplo-session";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
       { title: "XPLO AI Cybersecurity Edition — guided security research" },

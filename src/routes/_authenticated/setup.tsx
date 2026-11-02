@@ -3,7 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { useXplo } from "@/components/xplo-session";
 import { specialties } from "@/lib/xplo";
 
-export const Route = createFileRoute("/setup")({
+export const Route = createFileRoute("/_authenticated/setup")({
   head: () => ({ meta: [{ title: "Cybersecurity setup — XPLO AI" }, { name: "description", content: "Choose experience level, working environment and specialties for XPLO AI." }, { property: "og:title", content: "XPLO cybersecurity setup" }, { property: "og:description", content: "Personalize guidance for your environment and specialties." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Setup,
 });

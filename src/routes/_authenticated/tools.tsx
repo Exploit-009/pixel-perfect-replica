@@ -3,7 +3,7 @@ import { AppShell } from "@/components/app-shell";
 import { useXplo } from "@/components/xplo-session";
 import { tools } from "@/lib/xplo";
 
-export const Route = createFileRoute("/tools")({
+export const Route = createFileRoute("/_authenticated/tools")({
   head: () => ({ meta: [{ title: "Security tool guides — XPLO AI" }, { name: "description", content: "Learn Nmap, Wireshark, Burp Suite, ZAP, Ghidra, YARA and Kali workflows with guided commands." }, { property: "og:title", content: "Security tool guides" }, { property: "og:description", content: "Guided workflows for common security tools. XPLO does not execute them." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Tools,
 });

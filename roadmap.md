@@ -8,3 +8,5 @@
 - [ ] Local model (Ollama) connection — blocked: needs a reachable, secured model address.
 - [x] Review main flows, authorization safeguards and mobile UX; fix defects found.
 - [ ] Publish XPLO AI — waiting: user declined the publish prompt; publish when ready.
+- [x] Add invite-only sign-in, user profiles, sign-out, and protected AI access.
+- [ ] Verify signed-out restrictions and invited-user access; first account must be invited by the owner.

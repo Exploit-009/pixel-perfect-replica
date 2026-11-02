@@ -5,7 +5,7 @@ import { AppShell } from "@/components/app-shell";
 import { useXplo } from "@/components/xplo-session";
 import { specialties, validateAssessment } from "@/lib/xplo";
 
-export const Route = createFileRoute("/assessment")({
+export const Route = createFileRoute("/_authenticated/assessment")({
   head: () => ({ meta: [{ title: "Authorized assessment planner — XPLO AI" }, { name: "description", content: "Define scope and confirm authorization before XPLO prepares a security assessment plan." }, { property: "og:title", content: "Authorized assessment planner" }, { property: "og:description", content: "Scope-first security assessment planning with authorization confirmation." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Assessment,
 });

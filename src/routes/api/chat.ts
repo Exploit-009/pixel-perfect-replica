@@ -1,10 +1,22 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { streamResponse, GatewayError } from '@lovable.dev/ai-gateway';
+import { createClient } from '@supabase/supabase-js';
 import { buildModelInput, chatSchema, systemInstructions } from '@/lib/xplo';
+import { bearerToken, isAllowedUser } from '@/lib/access';
+
+async function invitedUser(request: Request) {
+ const token=bearerToken(request.headers.get('authorization'));
+ const url=process.env['SUPABASE_URL'];const key=process.env['SUPABASE_PUBLISHABLE_KEY'];
+ if(!token||!url||!key)return false;
+ const client=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false,storage:undefined},global:{fetch:(input,init)=>{const h=new Headers(init?.headers);if(key.startsWith('sb_')&&h.get('Authorization')===`Bearer ${key}`)h.delete('Authorization');h.set('apikey',key);return fetch(input,{...init,headers:h});}}});
+ const {data,error}=await client.auth.getUser(token);
+ return !error&&isAllowedUser(data.user);
+}
 
 export const Route = createFileRoute('/api/chat')({server:{handlers:{POST:async({request})=>{
  const origin=request.headers.get('origin');
  if(origin && origin!==new URL(request.url).origin)return Response.json({error:'Request origin not allowed.'},{status:403});
+ if(!(await invitedUser(request)))return Response.json({error:'Sign in with an invited account to use XPLO.'},{status:401});
  const raw=await request.text();
  if(raw.length>120000)return Response.json({error:'This conversation is too long. Start a new conversation.'},{status:413});
  let body;try{body=chatSchema.parse(JSON.parse(raw));}catch{return Response.json({error:'Please send a valid conversation.'},{status:400});}
