@@ -12,7 +12,7 @@ export const Route = createFileRoute("/assessment")({
 
 const contexts = ["Isolated lab", "Authorized assessment", "Unknown third party"] as const;
 function Assessment() {
-  const { createThread, environment, level } = useXplo(); const navigate = useNavigate();
+  const { createThread, environment } = useXplo(); const navigate = useNavigate();
   const [form, setForm] = useState({ objective: "", scope: "", context: "Isolated lab" as (typeof contexts)[number], authorized: false, specialty: "Web security" });
   const [error, setError] = useState("");
   const field = "mt-1.5 w-full rounded-md border bg-input/30 px-3 py-2.5 text-sm outline-none focus:border-primary";
@@ -21,8 +21,11 @@ function Assessment() {
     try {
       const v = validateAssessment({ ...form, environment });
       const id = createThread(`${v.specialty} assessment plan`, "XPLO Security Core");
-      sessionStorage.setItem(`xplo-start-${id}`, `Create a ${v.context.toLowerCase()} ${v.specialty} assessment plan. Objective: ${v.objective}. Scope: ${v.scope}. The user attests ownership or written authorization. Include tools and installation, step-by-step commands with explanations, expected output, interpretation, verification, remediation, rollback/cleanup, and a report outline. Do not execute anything.`);
-      void level; navigate({ to: "/chat/$threadId", params: { threadId: id } });
+      sessionStorage.setItem(`xplo-start-${id}`, `Create a ${v.specialty} assessment plan for ${v.context === "Isolated lab" ? "an isolated lab" : "an authorized assessment"}.
+Objective: ${v.objective}
+Scope and exclusions: ${v.scope}
+I confirm I own this target or have written authorization.`);
+      navigate({ to: "/chat/$threadId", params: { threadId: id } });
     } catch (err) {
       const message = form.context === "Unknown third party" ? "XPLO will not prepare target-specific testing for an unknown third party. Choose an isolated lab, or confirm authorization." : !form.authorized ? "Confirm ownership or written authorization first." : "Add an objective of at least 10 characters and a defined scope.";
       setError(message); toast.error(message); void err;

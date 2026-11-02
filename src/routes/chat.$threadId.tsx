@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { UIMessage } from "ai";
 import { Square, Trash2 } from "lucide-react";
@@ -19,13 +19,14 @@ function textOf(m: UIMessage) { return m.parts.map((p) => (p.type === "text" ? p
 
 function ChatPage() {
   const { threadId } = Route.useParams();
-  const { threads, updateMessages, removeThread, environment, level } = useXplo();
+  const { threads, updateMessages, removeThread, environment, level, selectedSpecialties } = useXplo();
   const thread = threads.find((t) => t.id === threadId);
   if (!thread) return <AppShell><div className="px-4 py-16 text-center"><p className="font-semibold">This conversation is no longer available.</p><p className="mt-2 text-sm text-muted-foreground">Conversations are not saved after the page is closed or reloaded.</p><Link to="/" className="mt-5 inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground">Start again</Link></div></AppShell>;
-  return <AppShell><Chat key={threadId} threadId={threadId} agent={thread.agent} initial={thread.messages} environment={environment} level={level} update={updateMessages} remove={removeThread} /></AppShell>;
+  return <AppShell><Chat key={threadId} threadId={threadId} agent={thread.agent} initial={thread.messages} environment={environment} level={level} specialties={selectedSpecialties} update={updateMessages} remove={removeThread} /></AppShell>;
 }
 
-function Chat({ threadId, agent, initial, environment, level, update, remove }: { threadId: string; agent: string; initial: UIMessage[]; environment: string; level: string; update: (id: string, m: UIMessage[]) => void; remove: (id: string) => void }) {
+function Chat({ threadId, agent, initial, environment, level, specialties, update, remove }: { threadId: string; agent: string; initial: UIMessage[]; environment: string; level: string; specialties: string[]; update: (id: string, m: UIMessage[]) => void; remove: (id: string) => void }) {
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<UIMessage[]>(initial);
   const [status, setStatus] = useState<"ready" | "submitted" | "streaming" | "error">("ready");
   const [error, setError] = useState("");
@@ -49,7 +50,7 @@ function Chat({ threadId, agent, initial, environment, level, update, remove }: 
     abort.current = controller;
     let answer = "";
     try {
-      const res = await fetch("/api/chat", { method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ agent, environment, level, messages: history.map((m) => ({ role: m.role, content: textOf(m) })) }) });
+      const res = await fetch("/api/chat", { method: "POST", signal: controller.signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ agent, environment, level, specialties, messages: history.map((m) => ({ role: m.role, content: textOf(m) })) }) });
       if (!res.ok || !res.body) { const data = await res.json().catch(() => ({})); throw new Error(data.error ?? "XPLO could not answer right now."); }
       setStatus("streaming");
       const reader = res.body.getReader(); const decoder = new TextDecoder(); let buffer = "";
@@ -73,7 +74,7 @@ function Chat({ threadId, agent, initial, environment, level, update, remove }: 
       setError(e instanceof Error ? e.message : "XPLO could not answer right now.");
       setStatus("error");
     } finally { abort.current = null; requestAnimationFrame(() => textarea.current?.focus()); }
-  }, [agent, commit, environment, level, status]);
+  }, [agent, commit, environment, level, specialties, status]);
 
   useEffect(() => {
     if (started.current) return; started.current = true;
@@ -85,7 +86,7 @@ function Chat({ threadId, agent, initial, environment, level, update, remove }: 
     <div className="flex h-[calc(100dvh-8.5rem)] flex-col">
       <div className="flex items-center justify-between border-b px-4 py-2 text-xs">
         <span className="font-mono uppercase tracking-widest text-primary">{agent}</span>
-        <button onClick={() => { abort.current?.abort(); remove(threadId); history.back(); }} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-destructive"><Trash2 className="size-3.5" /> Clear</button>
+        <button onClick={() => { abort.current?.abort(); remove(threadId); navigate({ to: "/" }); }} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-destructive"><Trash2 className="size-3.5" /> Clear</button>
       </div>
       <Conversation className="min-h-0">
         <ConversationContent>
