@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { streamResponse, GatewayError } from '@lovable.dev/ai-gateway';
 import { createClient } from '@supabase/supabase-js';
-import { buildModelInput, chatSchema, systemInstructions } from '@/lib/xplo';
+import { buildModelInput, chatSchema, systemInstructions } from '@/lib/xplo-chat';
 import { bearerToken, isAllowedUser } from '@/lib/access';
 
 async function invitedUser(request: Request) {

@@ -20,8 +20,7 @@ function Assessment() {
     e.preventDefault();
     try {
       const v = validateAssessment({ ...form, environment });
-      const id = createThread(`${v.specialty} assessment plan`, "XPLO Security Core");
-      sessionStorage.setItem(`xplo-start-${id}`, `Create a ${v.specialty} assessment plan for ${v.context === "Isolated lab" ? "an isolated lab" : "an authorized assessment"}.
+      const id = createThread(`${v.specialty} assessment plan`, "XPLO Security Core", `Create a ${v.specialty} assessment plan for ${v.context === "Isolated lab" ? "an isolated lab" : "an authorized assessment"}.
 Objective: ${v.objective}
 Scope and exclusions: ${v.scope}
 I confirm I own this target or have written authorization.`);

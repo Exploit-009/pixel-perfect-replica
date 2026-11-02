@@ -23,8 +23,7 @@ function Home() {
   const { createThread } = useXplo();
   const navigate = useNavigate();
   const open = (title: string, agent: string, prompt: string) => {
-    const id = createThread(title, agent);
-    sessionStorage.setItem(`xplo-start-${id}`, prompt);
+    const id = createThread(title, agent, prompt);
     navigate({ to: "/chat/$threadId", params: { threadId: id } });
   };
   return (
