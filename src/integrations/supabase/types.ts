@@ -14,6 +14,217 @@ export type Database = {
   }
   public: {
     Tables: {
+      execution_audit: {
+        Row: {
+          command_id: string | null
+          created_at: string
+          details: Json
+          event: string
+          id: string
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          command_id?: string | null
+          created_at?: string
+          details?: Json
+          event: string
+          id?: string
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          command_id?: string | null
+          created_at?: string
+          details?: Json
+          event?: string
+          id?: string
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_audit_command_id_fkey"
+            columns: ["command_id"]
+            isOneToOne: false
+            referencedRelation: "execution_commands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "execution_audit_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "execution_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      execution_commands: {
+        Row: {
+          argv: string[]
+          command: string
+          confirmed_at: string | null
+          created_at: string
+          duration_ms: number | null
+          exit_code: number | null
+          expires_at: string
+          id: string
+          remote_job_id: string | null
+          session_id: string
+          state: string
+          stderr: string
+          stdout: string
+          user_id: string
+        }
+        Insert: {
+          argv: string[]
+          command: string
+          confirmed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          exit_code?: number | null
+          expires_at: string
+          id?: string
+          remote_job_id?: string | null
+          session_id: string
+          state?: string
+          stderr?: string
+          stdout?: string
+          user_id: string
+        }
+        Update: {
+          argv?: string[]
+          command?: string
+          confirmed_at?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          exit_code?: number | null
+          expires_at?: string
+          id?: string
+          remote_job_id?: string | null
+          session_id?: string
+          state?: string
+          stderr?: string
+          stdout?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_commands_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "execution_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      execution_permissions: {
+        Row: {
+          allow_assessment: boolean
+          enabled: boolean
+          granted_at: string
+          user_id: string
+        }
+        Insert: {
+          allow_assessment?: boolean
+          enabled?: boolean
+          granted_at?: string
+          user_id: string
+        }
+        Update: {
+          allow_assessment?: boolean
+          enabled?: boolean
+          granted_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      execution_scopes: {
+        Row: {
+          authorization_document: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          kind: string
+          name: string
+          network: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          targets: string[]
+          user_id: string
+        }
+        Insert: {
+          authorization_document: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          kind: string
+          name: string
+          network?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          targets?: string[]
+          user_id: string
+        }
+        Update: {
+          authorization_document?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          kind?: string
+          name?: string
+          network?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          targets?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      execution_sessions: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          remote_id: string | null
+          scope_id: string
+          state: string
+          tools: string[]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          id?: string
+          remote_id?: string | null
+          scope_id: string
+          state?: string
+          tools?: string[]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          remote_id?: string | null
+          scope_id?: string
+          state?: string
+          tools?: string[]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "execution_sessions_scope_id_fkey"
+            columns: ["scope_id"]
+            isOneToOne: false
+            referencedRelation: "execution_scopes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
