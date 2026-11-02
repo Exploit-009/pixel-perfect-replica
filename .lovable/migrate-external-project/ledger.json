@@ -1,0 +1,89 @@
+{
+ "source": "XPLO-AI-Cybersecurity-Edition.zip",
+ "capabilities": [
+  {
+   "capability": "Application code and cybersecurity planning",
+   "source": "FastAPI + vanilla PWA",
+   "outcome": "migrate",
+   "status": "verified",
+   "next_action": null
+  },
+  {
+   "capability": "Schema and chat records",
+   "source": "SQLite conversations/preferences; no database export supplied",
+   "outcome": "user_declined_persistence",
+   "status": "accepted",
+   "next_action": "Keep conversations in session memory only per explicit choice"
+  },
+  {
+   "capability": "Auth identities and authorization",
+   "source": "Optional shared API token, no identity system or user export",
+   "outcome": "no_user_accounts_detected",
+   "status": "verified",
+   "next_action": "No accounts used; scope gate tested"
+  },
+  {
+   "capability": "Uploaded file bytes",
+   "source": "No uploaded content in starter",
+   "outcome": "not_present",
+   "status": "accepted",
+   "next_action": null
+  },
+  {
+   "capability": "Local model engine",
+   "source": "Ollama-compatible qwen3 localhost endpoint",
+   "outcome": "preserve_as_future_bridge",
+   "status": "pending",
+   "next_action": "User needs a reachable authenticated model bridge; a hosted website cannot reach the user's localhost"
+  },
+  {
+   "capability": "Online model engine",
+   "source": "OpenAI-compatible chat contract",
+   "outcome": "migrate_to_cloud_ai",
+   "status": "verified",
+   "next_action": null
+  },
+  {
+   "capability": "Image/video engine",
+   "source": "Documented future adapter; no working implementation",
+   "outcome": "bridge_required",
+   "status": "pending",
+   "next_action": "User needs a GPU host running generative-models plus a secured job bridge"
+  },
+  {
+   "capability": "Security tool execution",
+   "source": "Not implemented; planning-only source",
+   "outcome": "guided_commands_only",
+   "status": "accepted",
+   "next_action": "Isolated execution requires a separately secured runner"
+  },
+  {
+   "capability": "Public endpoints and external callers",
+   "source": "Health, model settings, preferences, history, chat, cybersecurity endpoints; no known callers",
+   "outcome": "inspect_and_adapt",
+   "status": "pending",
+   "next_action": "Preserve capabilities in app; legacy external API cutover not verified"
+  },
+  {
+   "capability": "Callbacks, webhooks, schedules, payments, email, analytics, secrets",
+   "source": "No production integrations detected",
+   "outcome": "not_present",
+   "status": "accepted",
+   "next_action": null
+  },
+  {
+   "capability": "PWA installation and offline shell",
+   "source": "Manifest and service worker",
+   "outcome": "migrate",
+   "status": "partial",
+   "next_action": "Install manifest added; no offline cache by design"
+  },
+  {
+   "capability": "Cutover and verification",
+   "source": "Local starter",
+   "outcome": "pending",
+   "status": "pending",
+   "next_action": "Check preview flows; publication requires user request"
+  }
+ ]
+}
