@@ -21,6 +21,7 @@ export const Route = createFileRoute('/api/chat')({server:{handlers:{POST:async(
  }});
  return new Response(stream,{headers:{'Content-Type':'application/x-ndjson','Cache-Control':'no-store'}});
  }catch(error){
+ if(request.signal.aborted)return new Response(null,{status:499});
  const message=error instanceof GatewayError && error.httpStatus===402?'Online AI needs workspace credits before it can respond.':'Online AI is unavailable right now. Your message has not been saved.';
  return Response.json({error:message},{status:503});
  }
