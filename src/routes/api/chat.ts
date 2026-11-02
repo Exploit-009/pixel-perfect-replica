@@ -8,8 +8,10 @@ export const Route = createFileRoute('/api/chat')({server:{handlers:{POST:async(
  const raw=await request.text();
  if(raw.length>120000)return Response.json({error:'This conversation is too long. Start a new conversation.'},{status:413});
  let body;try{body=chatSchema.parse(JSON.parse(raw));}catch{return Response.json({error:'Please send a valid conversation.'},{status:400});}
+ const input=buildModelInput(body.messages);
+ if(!input)return Response.json({error:'Please send a valid conversation.'},{status:400});
  try{
- const result=await streamResponse({model:'openai/gpt-6-astra',instructions:systemInstructions(body.agent,body.environment,body.level,body.specialties),input:body.messages},{signal:request.signal});
+ const result=await streamResponse({model:'openai/gpt-6-astra',instructions:systemInstructions(body.agent,body.environment,body.level,body.specialties),input},{signal:request.signal});
  const encoder=new TextEncoder();
  const stream=new ReadableStream({async start(controller){
   try{for await(const event of result){
