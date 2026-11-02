@@ -7,4 +7,4 @@
 - [ ] Connect image/video generation — blocked: needs a GPU host running the engine and a secured bridge address.
 - [ ] Local model (Ollama) connection — blocked: needs a reachable, secured model address.
 - [x] Review main flows, authorization safeguards and mobile UX; fix defects found.
-- [ ] Publish XPLO AI after the security scan check (user request).
+- [ ] Publish XPLO AI — waiting: user declined the publish prompt; publish when ready.
