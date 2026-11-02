@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { streamResponse, GatewayError } from '@lovable.dev/ai-gateway';
-import { chatSchema, systemInstructions } from '@/lib/xplo';
+import { buildModelInput, chatSchema, systemInstructions } from '@/lib/xplo';
 
 export const Route = createFileRoute('/api/chat')({server:{handlers:{POST:async({request})=>{
  const origin=request.headers.get('origin');
