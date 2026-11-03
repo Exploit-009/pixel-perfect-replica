@@ -83,6 +83,7 @@ function Chat({ threadId, agent, initial, environment, level, specialties, updat
         }
       }
       if (!answer) throw new Error("XPLO returned no answer. Please try again.");
+      setError(""); setLimitReached(false);
       setStatus("ready");
     } catch (e) {
       if (controller.signal.aborted) { setStatus("ready"); if (!answer) commit(history); return; }
