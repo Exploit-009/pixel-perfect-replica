@@ -4,6 +4,7 @@ import { Home, LogOut, MessageSquarePlus, ShieldCheck, SlidersHorizontal, Wrench
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import emblem from "@/assets/xplo-emblem.jpg";
+import { toast } from "sonner";
 import { useXplo } from "@/components/xplo-session";
 
 const nav = [
@@ -30,7 +31,13 @@ export function AppShell({ children }: { children: ReactNode }) {
     await queryClient.cancelQueries();
     queryClient.clear();
     reset();
-    await supabase.auth.signOut();
+    // Always end the session on this device, even when the sign-out service cannot be reached.
+    let confirmed = true;
+    try { confirmed = !(await supabase.auth.signOut()).error; } catch { confirmed = false; }
+    if (!confirmed) {
+      await supabase.auth.signOut({ scope: "local" }).catch(() => undefined);
+      toast.warning("Signed out on this device. The sign-out service could not be reached to end other sessions.");
+    }
     navigate({ to: "/auth", search: { redirect: "/" }, replace: true });
   };
   const start = () => {
