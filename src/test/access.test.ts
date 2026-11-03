@@ -25,3 +25,13 @@ describe("invite-only access", () => {
     expect(safeRedirect("/tools")).toBe("/tools");
   });
 });
+
+describe('sign-in failure messages', () => {
+  it('reports rejected credentials only for credential errors', async () => {
+    const { signInErrorMessage } = await import('@/lib/access');
+    expect(signInErrorMessage({ code: 'invalid_credentials', status: 400 })).toContain('not accepted');
+    expect(signInErrorMessage({ status: 500 })).toContain('unavailable');
+    expect(signInErrorMessage(null)).not.toContain('not accepted');
+    expect(signInErrorMessage({ status: 429 })).toContain('Too many');
+  });
+});

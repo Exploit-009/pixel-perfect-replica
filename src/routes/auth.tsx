@@ -3,7 +3,7 @@ import { useState, type FormEvent } from "react";
 import { Lock } from "lucide-react";
 import emblem from "@/assets/xplo-emblem.jpg";
 import { supabase } from "@/integrations/supabase/client";
-import { safeRedirect } from "@/lib/access";
+import { safeRedirect, signInErrorMessage } from "@/lib/access";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (search: Record<string, unknown>) => ({ redirect: safeRedirect(search["redirect"]) }),
@@ -33,11 +33,17 @@ function SignIn() {
     e.preventDefault();
     setBusy(true);
     setError("");
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    setBusy(false);
-    if (signInError) {
-      setError("That email and password were not accepted. XPLO is invite-only.");
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      if (signInError) {
+        setError(signInErrorMessage(signInError));
+        return;
+      }
+    } catch {
+      setError(signInErrorMessage(null));
       return;
+    } finally {
+      setBusy(false);
     }
     navigate({ to: redirect, replace: true });
   };
