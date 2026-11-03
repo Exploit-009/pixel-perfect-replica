@@ -30,12 +30,13 @@ export const Route = createFileRoute('/api/chat')({server:{handlers:{POST:async(
    if(event.type==='response.output_text.delta')controller.enqueue(encoder.encode(JSON.stringify({text:event.delta})+'\n'));
    if(event.type==='response.refusal.delta')controller.enqueue(encoder.encode(JSON.stringify({text:event.delta})+'\n'));
   }controller.enqueue(encoder.encode(JSON.stringify({done:true})+'\n'));}
-  catch(error){if(!request.signal.aborted)controller.enqueue(encoder.encode(JSON.stringify({error:'The response was interrupted. Your conversation remains here; you can try again.'})+'\n'));}
+  catch(error){if(!request.signal.aborted){console.error('[chat] AI stream interrupted',error instanceof GatewayError?`status ${error.httpStatus}`:'unexpected error');}if(!request.signal.aborted)controller.enqueue(encoder.encode(JSON.stringify({error:'The response was interrupted. Your conversation remains here; you can try again.'})+'\n'));}
   finally{controller.close();}
  }});
  return new Response(stream,{headers:{'Content-Type':'application/x-ndjson','Cache-Control':'no-store'}});
  }catch(error){
  if(request.signal.aborted)return new Response(null,{status:499});
+ console.error('[chat] AI gateway request failed',error instanceof GatewayError?`status ${error.httpStatus}`:'unexpected error');
  const message=error instanceof GatewayError && error.httpStatus===402?'Online AI needs workspace credits before it can respond.':'Online AI is unavailable right now. Your message has not been saved.';
  return Response.json({error:message},{status:503});
  }
