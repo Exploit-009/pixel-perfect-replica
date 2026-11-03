@@ -20,7 +20,7 @@ export function safeRedirect(value: unknown): string {
 }
 
 /** Explains a failed sign-in: rejected credentials versus a sign-in service or network problem. */
-export function signInErrorMessage(error: { status?: number; code?: string; name?: string } | null | undefined): string {
+export function signInErrorMessage(error: { status?: number | undefined; code?: string | undefined } | null | undefined): string {
   if (error?.code === 'invalid_credentials' || error?.status === 400 || error?.status === 401 || error?.status === 422) return 'That email and password were not accepted. XPLO is invite-only.';
   if (error?.code === 'email_not_confirmed') return 'This account is not confirmed yet. Ask the owner to confirm it.';
   if (error?.status === 429 || error?.code === 'over_request_rate_limit') return 'Too many sign-in attempts. Wait a minute and try again.';
