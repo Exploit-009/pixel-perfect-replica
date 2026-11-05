@@ -22,6 +22,13 @@
       "when": 1793636399014,
       "tag": "0002_restrict_execution_table_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793845803355,
+      "tag": "0003_add_opt_in_saved_conversations",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,8 @@ type Session = {
  createThread:(title:string,agent?:string,firstPrompt?:string)=>string;
  /** Returns the first prompt waiting for this conversation exactly once, then forgets it. */
  takeFirstPrompt:(id:string)=>string|null;
+ /** Puts a conversation the user chose to save back into memory so it can be continued. */
+ restoreThread:(thread:Thread)=>void;
  updateMessages:(id:string,messages:UIMessage[])=>void; removeThread:(id:string)=>void;reset:()=>void;
  environment:string;setEnvironment:(value:string)=>void;level:string;setLevel:(value:string)=>void;selectedSpecialties:string[];setSelectedSpecialties:(value:string[])=>void};
 const SessionContext = createContext<Session | null>(null);
@@ -24,10 +26,11 @@ export function XploSession({children}:{children:ReactNode}) {
   return id;
  },[]);
  const takeFirstPrompt=useCallback((id:string)=>{const prompt=firstPrompts.current.get(id)??null;firstPrompts.current.delete(id);return prompt;},[]);
+ const restoreThread=useCallback((thread:Thread)=>setThreads(old=>old.some(t=>t.id===thread.id)?old:[thread,...old]),[]);
  const updateMessages=useCallback((id:string,messages:UIMessage[])=>setThreads(old=>old.map(t=>t.id===id?{...t,messages}:t)),[]);
  const removeThread=useCallback((id:string)=>{firstPrompts.current.delete(id);setThreads(old=>old.filter(t=>t.id!==id));},[]);
  const reset=useCallback(()=>{firstPrompts.current.clear();setThreads([]);},[]);
- const value=useMemo(()=>({threads,createThread,takeFirstPrompt,updateMessages,removeThread,reset,environment,setEnvironment,level,setLevel,selectedSpecialties,setSelectedSpecialties}),[threads,createThread,takeFirstPrompt,updateMessages,removeThread,reset,environment,level,selectedSpecialties]);
+ const value=useMemo(()=>({threads,createThread,takeFirstPrompt,restoreThread,updateMessages,removeThread,reset,environment,setEnvironment,level,setLevel,selectedSpecialties,setSelectedSpecialties}),[threads,createThread,takeFirstPrompt,restoreThread,updateMessages,removeThread,reset,environment,level,selectedSpecialties]);
  return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
 }
 export function useXplo(){const value=useContext(SessionContext);if(!value)throw new Error('XPLO session is missing');return value;}

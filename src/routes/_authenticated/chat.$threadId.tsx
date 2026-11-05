@@ -11,6 +11,9 @@ import { Shimmer } from "@/components/ai-elements/shimmer";
 import emblem from "@/assets/xplo-emblem.jpg";
 import { supabase } from "@/integrations/supabase/client";
 import { checkConversationLimits } from "@/lib/xplo";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { deleteSavedChat, loadSavedChat, saveChat, savedListKey, useSavePreference } from "@/lib/saved-chats";
 
 export const Route = createFileRoute("/_authenticated/chat/$threadId")({
   head: () => ({ meta: [{ title: "Conversation — XPLO AI" }, { name: "description", content: "Private guided cybersecurity conversation with XPLO AI." }, { property: "og:title", content: "XPLO AI conversation" }, { property: "og:description", content: "Guided cybersecurity research conversation." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -22,18 +25,28 @@ const asRequest = (messages: UIMessage[]) => messages.map((m) => ({ role: m.role
 
 function ChatPage() {
   const { threadId } = Route.useParams();
-  const { threads, updateMessages, removeThread, takeFirstPrompt, createThread, environment, level, selectedSpecialties } = useXplo();
+  const { threads, updateMessages, removeThread, takeFirstPrompt, createThread, restoreThread, environment, level, selectedSpecialties } = useXplo();
   const navigate = useNavigate();
   const thread = threads.find((t) => t.id === threadId);
-  if (!thread) return <AppShell><div className="px-4 py-16 text-center"><p className="font-semibold">This conversation is no longer available.</p><p className="mt-2 text-sm text-muted-foreground">Conversations are not saved after the page is closed or reloaded.</p><Link to="/" className="mt-5 inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground">Start again</Link></div></AppShell>;
+  // A conversation that is not in memory may have been saved by the user earlier; only their own rows are readable.
+  const saved = useQuery({ queryKey: ["saved-conversation", threadId], queryFn: () => loadSavedChat(threadId), enabled: !thread, retry: false, staleTime: 0, gcTime: 0 });
+  useEffect(() => {
+    if (!thread && saved.data) restoreThread({ id: saved.data.id, title: saved.data.title, agent: saved.data.agent, messages: saved.data.messages });
+  }, [thread, saved.data, restoreThread]);
+  if (!thread && saved.isLoading) return <AppShell><div className="px-4 py-16 text-center text-sm text-muted-foreground">Opening conversation…</div></AppShell>;
+  if (!thread) return <AppShell><div className="px-4 py-16 text-center"><p className="font-semibold">This conversation is no longer available.</p><p className="mt-2 text-sm text-muted-foreground">Conversations are only kept after the page closes if you turn on saving in Setup.</p><Link to="/" className="mt-5 inline-flex h-10 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground">Start again</Link></div></AppShell>;
   const startNew = () => navigate({ to: "/chat/$threadId", params: { threadId: createThread("New conversation", thread.agent) } });
-  return <AppShell><Chat key={threadId} threadId={threadId} agent={thread.agent} initial={thread.messages} environment={environment} level={level} specialties={selectedSpecialties} update={updateMessages} remove={removeThread} takeFirstPrompt={takeFirstPrompt} startNew={startNew} /></AppShell>;
+  return <AppShell><Chat key={threadId} threadId={threadId} title={thread.title} agent={thread.agent} initial={thread.messages} environment={environment} level={level} specialties={selectedSpecialties} update={updateMessages} remove={removeThread} takeFirstPrompt={takeFirstPrompt} startNew={startNew} /></AppShell>;
 }
 
-type ChatProps = { threadId: string; agent: string; initial: UIMessage[]; environment: string; level: string; specialties: string[]; update: (id: string, m: UIMessage[]) => void; remove: (id: string) => void; takeFirstPrompt: (id: string) => string | null; startNew: () => void };
+type ChatProps = { threadId: string; title: string; agent: string; initial: UIMessage[]; environment: string; level: string; specialties: string[]; update: (id: string, m: UIMessage[]) => void; remove: (id: string) => void; takeFirstPrompt: (id: string) => string | null; startNew: () => void };
 
-function Chat({ threadId, agent, initial, environment, level, specialties, update, remove, takeFirstPrompt, startNew }: ChatProps) {
+function Chat({ threadId, title, agent, initial, environment, level, specialties, update, remove, takeFirstPrompt, startNew }: ChatProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { enabled: saveOn } = useSavePreference();
+  const saveOnRef = useRef(saveOn);
+  saveOnRef.current = saveOn;
   const [messages, setMessages] = useState<UIMessage[]>(initial);
   const [status, setStatus] = useState<"ready" | "submitted" | "streaming" | "error">("ready");
   const [error, setError] = useState("");
@@ -85,13 +98,19 @@ function Chat({ threadId, agent, initial, environment, level, specialties, updat
       if (!answer) throw new Error("XPLO returned no answer. Please try again.");
       setError(""); setLimitReached(false);
       setStatus("ready");
+      // Saved only when the user opted in, and only after a reply completes.
+      if (saveOnRef.current) {
+        saveChat({ id: threadId, title, agent, messages: [...history, { ...assistant, parts: [{ type: "text", text: answer }] }] })
+          .then(() => queryClient.invalidateQueries({ queryKey: savedListKey }))
+          .catch(() => toast.error("This conversation could not be saved. It is still open here."));
+      }
     } catch (e) {
       if (controller.signal.aborted) { setStatus("ready"); if (!answer) commit(history); return; }
       commit(answer ? [...history, { ...assistant, parts: [{ type: "text", text: answer }] }] : history);
       setError(e instanceof Error ? e.message : "XPLO could not answer right now.");
       setStatus("error");
     } finally { abort.current = null; requestAnimationFrame(() => textarea.current?.focus()); }
-  }, [agent, commit, environment, level, specialties]);
+  }, [agent, commit, environment, level, queryClient, specialties, threadId, title]);
 
   /** Validates a typed message before it is sent. Throwing keeps the draft in the composer. */
   const submit = useCallback((text: string) => {
@@ -127,7 +146,7 @@ function Chat({ threadId, agent, initial, environment, level, specialties, updat
     <div className="flex h-[calc(100dvh-8.5rem)] flex-col">
       <div className="flex items-center justify-between border-b px-4 py-2 text-xs">
         <span className="font-mono uppercase tracking-widest text-primary">{agent}</span>
-        <button onClick={() => { abort.current?.abort(); remove(threadId); navigate({ to: "/" }); }} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-destructive"><Trash2 className="size-3.5" /> Clear</button>
+        <button onClick={() => { abort.current?.abort(); remove(threadId); deleteSavedChat(threadId).then(() => queryClient.invalidateQueries({ queryKey: savedListKey })).catch(() => toast.error("The saved copy could not be deleted. Try again from Home.")); navigate({ to: "/" }); }} className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-destructive"><Trash2 className="size-3.5" /> Clear</button>
       </div>
       <Conversation className="min-h-0">
         <ConversationContent>
@@ -153,7 +172,7 @@ function Chat({ threadId, agent, initial, environment, level, specialties, updat
             </PromptInputFooter>
           </PromptInput>
         </PromptInputProvider>
-        <p className="mt-1.5 text-center text-[10px] text-muted-foreground">XPLO cannot run commands. Use only systems you own or are authorized to test.</p>
+        <p className="mt-1.5 text-center text-[10px] text-muted-foreground">{saveOn ? "Saving to your private history. " : ""}XPLO cannot run commands. Use only systems you own or are authorized to test.</p>
       </div>
     </div>
   );

@@ -230,19 +230,52 @@ export type Database = {
           created_at: string
           display_name: string
           id: string
+          save_conversations: boolean
           updated_at: string
         }
         Insert: {
           created_at?: string
           display_name?: string
           id: string
+          save_conversations?: boolean
           updated_at?: string
         }
         Update: {
           created_at?: string
           display_name?: string
           id?: string
+          save_conversations?: boolean
           updated_at?: string
+        }
+        Relationships: []
+      }
+      saved_conversations: {
+        Row: {
+          agent: string
+          created_at: string
+          id: string
+          messages: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agent?: string
+          created_at?: string
+          id: string
+          messages?: Json
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agent?: string
+          created_at?: string
+          id?: string
+          messages?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
