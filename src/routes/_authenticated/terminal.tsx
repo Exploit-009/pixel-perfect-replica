@@ -190,7 +190,7 @@ function Terminal() {
                 {data.audit.length === 0 ? <li className="text-xs text-muted-foreground">No activity recorded yet.</li> : null}
                 {data.audit.map((a) => {
                   const d = a.details as Record<string, unknown>;
-                  const note = typeof d?.["reason"] === "string" ? d["reason"] : Array.isArray(d?.["reasons"]) ? (d.reasons as string[]).join(" ") : Array.isArray(d?.["argv"]) ? (d.argv as string[]).join(" ") : "";
+                  const note = typeof d?.["reason"] === "string" ? d["reason"] : Array.isArray(d?.["reasons"]) ? (d["reasons"] as string[]).join(" ") : Array.isArray(d?.["argv"]) ? (d["argv"] as string[]).join(" ") : "";
                   return <li key={a.id} className="border-b pb-1.5 text-xs"><span className="font-mono text-primary">{a.event}</span> <span className="text-muted-foreground">{new Date(a.created_at).toLocaleString()}</span>{note ? <p className="break-words text-muted-foreground">{note}</p> : null}</li>;
                 })}
               </ul>
