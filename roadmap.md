@@ -18,5 +18,7 @@
 - [x] Sign-in separates rejected credentials from service/network problems; sign-out ends the session on this device even if the service is unreachable.
 - [x] Regression tests added (20 passing). Signed-in assessment launch, real AI reply, busy-draft handling and empty browser storage checked on a phone-sized preview.
 - [ ] Execution provenance — blocked: terminal files and the first execution migration (0001) are not in local history; need a backup or original export. Live execution tables exist and were left untouched; no migration was rerun or reconstructed.
-- [ ] Terminal and execution service (Phase 1) — not started: needs a separately provisioned isolated runner and your approval.
+- [x] Native Terminal page: scopes, session, command preview, per-command confirmation, output and audit history; locked while no runner is connected.
+- [ ] Connect an isolated runner — blocked: needs a separately hosted runner (protocol in docs/execution-runner.md) and the XPLO_RUNNER_URL / XPLO_RUNNER_TOKEN secrets.
+- [ ] Owner grants: set execution permission and approve scopes in the backend (no in-app approval by design).
 - [ ] Not yet verified: cancellation on leaving mid-stream in a browser, conversation-limit message in the UI, profile-load failure display, two-account data isolation, fresh deep security scan.

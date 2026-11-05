@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Home, LogOut, MessageSquarePlus, ShieldCheck, SlidersHorizontal, Wrench } from "lucide-react";
+import { Home, LogOut, MessageSquarePlus, ShieldCheck, SlidersHorizontal, SquareTerminal, Wrench } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import emblem from "@/assets/xplo-emblem.jpg";
@@ -11,6 +11,7 @@ const nav = [
   { to: "/", label: "Home", icon: Home },
   { to: "/assessment", label: "Assess", icon: ShieldCheck },
   { to: "/tools", label: "Tools", icon: Wrench },
+  { to: "/terminal", label: "Terminal", icon: SquareTerminal },
   { to: "/setup", label: "Setup", icon: SlidersHorizontal },
 ] as const;
 
@@ -66,7 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </header>
       <div className="flex-1 pb-20">{children}</div>
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t bg-background/95 backdrop-blur">
-        <ul className="mx-auto grid max-w-5xl grid-cols-4">
+        <ul className="mx-auto grid max-w-5xl grid-cols-5">
           {nav.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <Link to={to} activeOptions={{ exact: true }} className="flex flex-col items-center gap-1 py-2.5 text-[11px] text-muted-foreground" activeProps={{ className: "flex flex-col items-center gap-1 py-2.5 text-[11px] text-primary" }}>

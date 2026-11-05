@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   MAX_COMMAND_LENGTH, PREVIEW_TTL_MS, SESSION_TTL_MS, isValidScopeTarget, scopeKinds, scopeNetworks,
@@ -132,7 +134,7 @@ export const closeSession = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-async function loadActiveSession(supabase: Parameters<Parameters<ReturnType<typeof createServerFn>["handler"]>[0]>[0] extends never ? never : any, sessionId: string) {
+async function loadActiveSession(supabase: SupabaseClient<Database>, sessionId: string) {
   const { data: session } = await supabase.from("execution_sessions").select("*").eq("id", sessionId).maybeSingle();
   if (!session) throw new Error("Session not found.");
   if (session.state !== "active" || new Date(session.expires_at).getTime() <= Date.now()) throw new Error("This session is no longer active.");
