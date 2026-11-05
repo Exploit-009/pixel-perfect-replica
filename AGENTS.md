@@ -10,7 +10,7 @@
 <!-- LOVABLE:END -->
 
 ## Architecture rules
-- Conversations live only in in-memory React context (`src/components/xplo-session.tsx`); never persist chats to storage or the database — the user chose no saved history.
+- Conversations live in in-memory React context (`src/components/xplo-session.tsx`) and never in browser storage; they reach the database only through the opt-in `profiles.save_conversations` flag via `src/lib/saved-chats.ts`, into `saved_conversations` rows protected by owner-only RLS — saving must stay off by default.
 - Model calls go through `/api/chat` using the AI Gateway SDK; chat instructions and model input live in `src/lib/xplo-chat.ts`, imported only by the API route and tests, while browser-safe data and validation stay in `src/lib/xplo.ts` — this prevents page imports from pulling in server instructions.
 - Starter prompts are handed off through `XploSession.createThread` and consumed once by `takeFirstPrompt`, never browser storage — this keeps assessment details memory-only while preserving prompt launch behavior.
 - External engines (generative-models, local models, tool runners) connect only through separate authenticated bridges; never vendor or modify the engine code here.

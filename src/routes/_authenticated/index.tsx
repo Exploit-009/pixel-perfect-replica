@@ -4,6 +4,7 @@ import { AppShell } from "@/components/app-shell";
 import { AgentIcon } from "@/components/agent-icon";
 import { agents, specialties } from "@/lib/xplo";
 import { useXplo } from "@/components/xplo-session";
+import { SavedChatsList } from "@/components/saved-chats";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -51,11 +52,12 @@ function Home() {
             </button>
           ))}
         </div>
+        <SavedChatsList />
         <section className="mt-10 rounded-md border bg-card/70 p-4">
           <h2 className="font-semibold">Security modules</h2>
           <div className="mt-3 flex flex-wrap gap-2">{specialties.map((s) => <span key={s} className="rounded border px-2.5 py-1 text-xs text-muted-foreground">{s}</span>)}</div>
         </section>
-        <p className="mt-6 text-xs text-muted-foreground">Conversations are kept only while this page stays open. XPLO explains and plans; it does not run tools or touch your systems.</p>
+        <p className="mt-6 text-xs text-muted-foreground">Conversations are kept only while this page stays open unless you turn on saving in Setup. XPLO explains and plans; it does not run tools or touch your systems.</p>
       </main>
     </AppShell>
   );
