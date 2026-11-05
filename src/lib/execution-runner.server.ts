@@ -20,7 +20,7 @@ export async function runnerCall<T>(path: string, method: "POST" | "DELETE", bod
     res = await fetch(`${cfg.url}${path}`, {
       method,
       headers: { "content-type": "application/json", authorization: `Bearer ${cfg.token}` },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch {
