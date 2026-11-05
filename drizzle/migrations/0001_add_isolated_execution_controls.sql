@@ -1,0 +1,2 @@
+-- The content of this migration cannot be recovered: the original SQL file is missing from the project history.
+-- The execution tables it created (execution_permissions, execution_scopes, execution_sessions, execution_commands, execution_audit) already exist in the live database, so nothing is applied here.
