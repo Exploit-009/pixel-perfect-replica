@@ -11,7 +11,9 @@ type Session = {
  restoreThread:(thread:Thread)=>void;
  updateMessages:(id:string,messages:UIMessage[])=>void; removeThread:(id:string)=>void;reset:()=>void;
  environment:string;setEnvironment:(value:string)=>void;level:string;setLevel:(value:string)=>void;selectedSpecialties:string[];setSelectedSpecialties:(value:string[])=>void};
-const SessionContext = createContext<Session | null>(null);
+// Kept on globalThis so a hot reload of this file reuses the same context instead of orphaning open pages.
+const holder = globalThis as { __xploSessionContext?: ReturnType<typeof createContext<Session | null>> };
+const SessionContext = (holder.__xploSessionContext ??= createContext<Session | null>(null));
 export function XploSession({children}:{children:ReactNode}) {
  const [threads,setThreads]=useState<Thread[]>([]);
  const [environment,setEnvironment]=useState('Android + Termux');
