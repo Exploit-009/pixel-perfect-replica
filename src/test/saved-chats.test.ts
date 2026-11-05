@@ -13,7 +13,7 @@ describe('saved conversations', () => {
   it('restores well-formed turns and ignores malformed ones', () => {
     const out = fromStoredMessages([{ id: 'a', role: 'user', parts: [{ type: 'text', text: 'hi' }] }, { role: 'system', parts: [] }, null, { id: 'b', role: 'assistant', parts: [{ type: 'image' }] }]);
     expect(out).toHaveLength(1);
-    expect(out[0].id).toBe('a');
+    expect(out[0]?.id).toBe('a');
     expect(fromStoredMessages('nope')).toEqual([]);
   });
   it('titles an untitled conversation from the first question, capped at 52 characters', () => {
