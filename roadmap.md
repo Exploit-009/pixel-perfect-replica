@@ -28,3 +28,7 @@
 - [x] Placeholder added for the missing 0001 migration file (comment only) so new database changes can apply; live execution tables untouched.
 - [ ] Not verified end to end: a saved reply from the live AI — the AI service returned "unavailable" during testing (503), so saving was tested directly against the database. Two-account isolation not tested.
 - [ ] Terminal: still locked until permission, an approved scope and a connected runner exist (see Phase 0 notes).
+
+## Runner kit and shell request (5 Nov 2026)
+- [ ] Ready-to-deploy isolated runner kit (Docker-based, no shell, allow-listed tools, network off by default) delivered as a download; deploy and connect it on your own machine.
+- [x] Declined: "open shell access directly in the app" — would run commands on the app server, which XPLO forbids by design. Commands only run on the separate runner, one tool at a time, after approval.
