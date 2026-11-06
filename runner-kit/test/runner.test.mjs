@@ -57,7 +57,7 @@ test("sandbox is non-root, capability-free, read-only and offline by default", (
   assert.equal(at("--cap-drop"), "ALL");
   assert.equal(at("--user"), "10001:10001");
   assert.ok(a.includes("--read-only"));
-  assert.deepEqual(execArgs({ name: "x", argv: ["ls", "-la"], timeoutSeconds: 5 }).slice(-4), ["5", "ls", "-la"].length === 3 ? ["timeout", "-k", "5", "5"].slice(0, 0).concat(["5", "5", "ls", "-la"]) : []);
+  assert.deepEqual(execArgs({ name: "x", argv: ["ls", "-la"], timeoutSeconds: 7 }).slice(-6), ["timeout", "-k", "5", "7", "ls", "-la"]);
 });
 
 // ---- HTTP protocol with a fake Docker (no real containers) ----
