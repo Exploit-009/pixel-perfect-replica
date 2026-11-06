@@ -1,0 +1,9 @@
+{
+  "name": "xplo-isolated-runner",
+  "version": "1.0.0",
+  "description": "Isolated, disposable-container command runner for XPLO AI. Zero npm dependencies.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": { "start": "node src/server.mjs", "test": "node --test test/" }
+}
