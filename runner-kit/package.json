@@ -5,5 +5,5 @@
   "type": "module",
   "private": true,
   "engines": { "node": ">=20" },
-  "scripts": { "start": "node src/server.mjs", "test": "node --test test/" }
+  "scripts": { "start": "node src/server.mjs", "test": "node --test test/runner.test.mjs" }
 }

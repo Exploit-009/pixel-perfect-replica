@@ -1,0 +1,20 @@
+[Unit]
+Description=XPLO isolated runner
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+User=xplo
+# Rootless Docker socket for the xplo user (see README step 2)
+Environment=DOCKER_HOST=unix:///run/user/%U/docker.sock
+EnvironmentFile=/opt/xplo-runner/.env
+WorkingDirectory=/opt/xplo-runner
+ExecStart=/usr/bin/node src/server.mjs
+Restart=on-failure
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,4 @@
+# Caddy obtains a TLS certificate automatically. Replace with your runner's domain name.
+runner.example.com {
+	reverse_proxy 127.0.0.1:8787
+}
